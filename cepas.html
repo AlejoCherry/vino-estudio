@@ -1,0 +1,474 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="robots" content="noindex, nofollow"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Fichero de cepas</title><style>body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout: a pocket card file — sticky control bar (region · mode · filter), cards in a grid; full mode opens a bottom sheet per grape, plus a quick blind quiz */
+:root{
+  --bg:#F3F2EE; --panel:#FFFFFF; --ink:#22201F; --muted:#6C6763; --rule:#DDD9D2;
+  --tinto:#7C1D33; --blanco:#B08A1E; --accent:#7C1D33; --chip:#EFEAE3; --ok:#2E7D4F; --bad:#B3261E;
+  --f-display:"Bitter",Georgia,serif; --f-body:"Source Sans 3","Segoe UI",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#171514; --panel:#211E1C; --ink:#EEE9E4; --muted:#A39C95; --rule:#36312E;
+  --tinto:#D86A84; --blanco:#E2BF57; --accent:#D86A84; --chip:#2C2724; --ok:#6FCF97; --bad:#F28B82; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#171514; --panel:#211E1C; --ink:#EEE9E4; --muted:#A39C95; --rule:#36312E;
+  --tinto:#D86A84; --blanco:#E2BF57; --accent:#D86A84; --chip:#2C2724; --ok:#6FCF97; --bad:#F28B82; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45}
+.wrap{max-width:980px;margin:0 auto;padding-block:16px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-family:var(--f-display);font-size:28px;margin:0;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:13.5px;margin:2px 0 12px;max-width:62ch}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--rule)}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:999px;overflow:hidden;background:var(--panel)}
+.seg button{font:inherit;font-size:13px;border:0;background:transparent;color:var(--ink);padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);font-weight:600}
+.seg button:disabled{color:var(--muted);cursor:not-allowed}
+.seg button:focus-visible,.card:focus-visible,.qb:focus-visible,.x:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.quizbtn{margin-left:auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin-top:14px}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:7px;min-width:0;text-align:left;font:inherit;color:inherit}
+.full .card{cursor:pointer}
+.full .card:hover{border-color:var(--accent)}
+.top{display:flex;align-items:center;gap:10px}
+.glass{width:30px;height:30px;border-radius:50% 50% 46% 46%;flex:none;border:1px solid var(--rule)}
+.name{font-family:var(--f-display);font-weight:700;font-size:19px;line-height:1.15}
+.type{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700}
+.type.tinto{color:var(--tinto)} .type.blanco{color:var(--blanco)}
+.k{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.aro{display:flex;flex-wrap:wrap;gap:4px}
+.aro span{background:var(--chip);border-radius:4px;padding:1px 7px;font-size:12.5px}
+.struct{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:12.5px;align-items:center}
+.dots{display:inline-flex;gap:3px}
+.dots i{width:12px;height:6px;border-radius:2px;background:var(--rule)}
+.dots i.on{background:var(--accent)}
+.where{font-size:12.5px;color:var(--muted)}
+.more{font-size:12px;color:var(--accent);font-weight:600}
+.mini .more{display:none}
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--panel);color:var(--ink);width:min(720px,100%);max-height:88%;overflow:auto;border-radius:14px 14px 0 0;padding:16px max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.sheet h2{font-family:var(--f-display);font-size:24px;margin:0}
+.x{float:right;font:inherit;font-size:22px;line-height:1;border:0;background:var(--chip);color:var(--ink);border-radius:50%;width:34px;height:34px;cursor:pointer}
+.sec{border-top:1px solid var(--rule);padding-top:9px;margin-top:10px}
+.sec p{margin:3px 0}
+.fam{display:grid;grid-template-columns:96px 1fr;gap:3px 10px;font-size:13.5px}
+.fam b{font-weight:600;color:var(--muted)}
+.bars{display:grid;grid-template-columns:70px 1fr 54px;gap:5px 8px;align-items:center;font-size:13px}
+.track{height:8px;background:var(--chip);border-radius:4px;overflow:hidden}
+.track span{display:block;height:100%;background:var(--accent);border-radius:4px}
+ul.t{margin:3px 0;padding-left:18px} ul.t li{margin:2px 0}
+.say{background:var(--chip);border-radius:8px;padding:9px 11px;font-size:13.5px;font-style:italic}
+.anchor{border-left:3px solid var(--accent);padding-left:9px}
+/* quiz */
+.qcard{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:14px;margin-top:14px}
+.qcard h2{font-family:var(--f-display);font-size:20px;margin:0 0 6px}
+.qopts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:10px}
+.qb{font:inherit;padding:10px;border:1px solid var(--rule);border-radius:8px;background:var(--bg);color:var(--ink);cursor:pointer;font-weight:600}
+.qb.right{border-color:var(--ok);color:var(--ok)} .qb.wrong{border-color:var(--bad);color:var(--bad)}
+.qfb{margin-top:8px;font-size:13.5px;min-height:1.4em}
+.note{font-size:12px;color:var(--muted);margin-top:18px;max-width:70ch}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:up .18s ease-out}@keyframes up{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}}
+</style>
+
+<style>
+.second{font-size:12px;color:var(--muted)}
+.second b{font-weight:600}
+.badge{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--muted);color:var(--muted);border-radius:3px;padding:0 5px;margin-left:6px;vertical-align:2px}
+#q{font:inherit;font-size:14px;padding:7px 11px;border:1px solid var(--rule);border-radius:999px;background:var(--panel);color:var(--ink);flex:1 1 180px;min-width:0}
+#q:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.arlist{display:flex;flex-wrap:wrap;gap:5px}
+.arlist span{background:var(--chip);border-radius:4px;padding:2px 8px;font-size:13.5px;font-weight:600}
+.count{font-size:12px;color:var(--muted)}
+.zones{display:grid;grid-template-columns:auto 1fr;gap:3px 8px;font-size:12.5px}
+.zones b{font-weight:700;color:var(--accent);white-space:nowrap}
+.zfull{display:flex;flex-direction:column;gap:7px}
+.zfull div{border-left:3px solid var(--rule);padding-left:9px}
+.zfull b{color:var(--accent)}
+.zfull small{color:var(--muted)}
+</style>
+<div class="wrap">
+  <h1>Fichero de cepas</h1>
+  <p class="sub">Сорта из конспекта Sommellerie 1. Сверху — ароматы, типичные для Аргентины, затем — как они меняются от холодной зоны к тёплой, второй план и вина с taller. Нажми на карточку в режиме «Полная».</p>
+
+  <div class="bar">
+    <div class="row">
+      <span class="lbl">Регион</span>
+      <div class="seg" role="group" aria-label="Регион">
+        <button id="rg-ar" aria-pressed="true">Argentina</button>
+        <button id="rg-eu" disabled title="Добавим позже">Europa · скоро</button>
+      </div>
+      <input id="q" type="search" placeholder="Сорт или аромат: violeta, Torrontés…" aria-label="Поиск по сорту или аромату" autocomplete="off">
+    </div>
+    <div class="row">
+      <span class="lbl">Вид</span>
+      <div class="seg" role="group" aria-label="Вид">
+        <button id="md-mini" aria-pressed="false">Мини</button>
+        <button id="md-full" aria-pressed="true">Полная</button>
+      </div>
+      <span class="lbl" style="margin-left:6px">Тип</span>
+      <div class="seg" role="group" aria-label="Тип">
+        <button data-f="all" aria-pressed="true">Все</button>
+        <button data-f="blanco" aria-pressed="false">Blancas</button>
+        <button data-f="tinto" aria-pressed="false">Tintas</button>
+      </div>
+      <div class="seg"><button id="lowbtn" aria-pressed="false" title="Скрыть сорта, которых почти нет в Аргентине">Только AR</button></div>
+      <div class="seg quizbtn"><button id="qz" aria-pressed="false">Тренировка</button></div>
+    </div>
+    <div class="count" id="count"></div>
+  </div>
+
+  <div id="quiz" hidden></div>
+  <div id="grid" class="grid full"></div>
+
+  <p class="note">Шкалы 1–5 — ориентир для аргентинского стиля; место и винодел их сдвигают. Источники: мануал Sommellerie I (Variedades), типичные профили аргентинских регионов, вина и комментарии преподавателей на taller. Метка «мало в AR» — сорт почти не растёт в Аргентине, профиль дан мировой, по мануалу.</p>
+</div>
+
+<div id="scrim" class="scrim" hidden role="dialog" aria-modal="true" aria-labelledby="sh-name"><div class="sheet" id="sheet"></div></div>
+
+<script>
+/* r: region; ar: типично для Аргентины (5); more: второй план; s: 1–5; low: мало в Аргентине */
+const C=[
+/* ===== BLANCAS ===== */
+{id:"chardonnay",z:[["Frío", "Gualtallary alto, Patagonia, Chapadmalal", "lima, limón, manzana verde, piedra mojada; acidez marcada"], ["Templado", "Uco medio, Zona Alta del Río Mendoza", "pera, durazno, manzana"], ["Cálido", "San Rafael, Este, Tulum", "ananá, melón, mango; más cuerpo, menos acidez"]],r:"ar",n:"Chardonnay",t:"blanco",glass:"#E9CF6E",col:"amarillo; dorado si hubo barrica",
+ ar:["pera","manzana verde","durazno","ananá","vainilla"],
+ more:["cítricos, mineral (Gualtallary, zonas frías)","manteca, crema (FML)","brioche, pan (lías)","tostado, coco (barrica nueva)","melón (calor)"],
+ s:{acidez:3,cuerpo:4,alcohol:3.5,aroma:3},
+ where:"Valle de Uco (Gualtallary, Tupungato) · Zona Alta del Río Mendoza · San Rafael · frío: Alto Valle, Chapadmalal, Chubut",
+ place:"Сорт нейтральный — «зеркало». Холод: цитрус, яблоко, кислота. Тепло: тропики, больше тела.",
+ wood:"От acero до бочки; часто FML и выдержка на лиях.",
+ tells:["Интенсивность высокая, хотя сорт не ароматный → работа винодела","Масло, бриошь, ваниль поверх скромного фрукта","Кремовая текстура, тело выше среднего"],
+ vs:[["Viognier","цветы и абрикос, без «погребных» нот"],["Semillón","воск, мёд, кислоты меньше"]],
+ taller:["Callia Chardonnay 2025 (San Juan)","Terrazas Altos del Plata Chardonnay","Terrazas Origen Gualtallary Chardonnay"]},
+{id:"sb",z:[["Frío / altura", "Gualtallary, San Pablo, Patagonia", "ruda, pasto, pimiento verde, espárrago, piedra de fusil"], ["Costa atlántica", "Chapadmalal", "pomelo, lima, salino"], ["Templado–cálido", "Zona Alta, Salta baja", "maracuyá, pomelo maduro, durazno"]],r:"ar",n:"Sauvignon Blanc",t:"blanco",glass:"#EDEBB8",col:"acerado o amarillo verdoso pálido",
+ ar:["pomelo","lima","ruda","pasto cortado","pimiento verde"],
+ more:["maracuyá (zonas más cálidas)","espárrago","manzana verde","piedra de fusil (altura)","salino (costa atlántica)"],
+ s:{acidez:4.5,cuerpo:2,alcohol:3,aroma:4},
+ where:"Valle de Uco (Gualtallary, San Pablo) · Costa Atlántica (Chapadmalal) · Patagonia",
+ place:"Высота и холод → зелень, минеральность, кислота. Тепло → тропики. Дата сбора решает стиль.",
+ wood:"Обычно без бочки; иногда лии или бетонное яйцо.",
+ tells:["Зелень + цитрус: руда, трава, перец","Кислотность прямая и линейная (Agus)","Тело лёгкое, финал свежий"],
+ vs:[["Torrontés","цветы и виноград, кислоты меньше"],["Riesling","цветы, минеральность, кислотность «шире»"]],
+ taller:["Salentein Portillo Sauvignon Blanc 2025","Zorzal Eggo Blanc de Cal SB 2024 (Gualtallary)"]},
+{id:"riesling",z:[["Frío", "Alto Valle, Chubut, Costa Atlántica", "lima, limón, manzana verde, mineral"], ["Altura", "Valle de Uco", "flores blancas, durazno blanco, cítricos"], ["Con años", "cualquier zona", "petróleo / kerosene (TDN)"]],r:"ar",n:"Riesling",t:"blanco",glass:"#EFEAA8",col:"amarillo verdoso pálido",
+ ar:["lima","limón","manzana verde","flores blancas","piedra mojada"],
+ more:["petróleo / kerosene — TDN, с возрастом","durazno blanco","azahar","miel (dulces)"],
+ s:{acidez:5,cuerpo:2,alcohol:2.5,aroma:4},
+ where:"Alto Valle del Río Negro · Chubut · Valle de Uco (altura) · Costa Atlántica — немного, но растёт",
+ place:"Любит холод: в Патагонии — лайм и минеральность, в высокогорье Мендосы — цветы и свежесть.",
+ wood:"Почти без бочки, acero.",
+ tells:["Очень высокая кислотность у белого","Лайм + цветы + минеральность","С годами — нефть, керосин (TDN)"],
+ vs:[["Sauvignon Blanc","трава и руда вместо цветов"],["Torrontés","виноград и роза, кислоты меньше"]],
+ taller:["Humberto Canale Old Vineyard Riesling 2025"]},
+{id:"chenin",z:[["Frío / altura", "Uco, Patagonia", "manzana verde, cítricos, flores blancas"], ["Cálido", "San Rafael, Este", "manzana roja, membrillo, pera madura, miel"]],r:"ar",n:"Chenin Blanc",t:"blanco",glass:"#EBDD94",col:"amarillo pálido a amarillo",
+ ar:["manzana verde","manzana roja","membrillo","pera","miel"],
+ more:["lanolina (con los años)","flores blancas","cítricos"],
+ s:{acidez:4,cuerpo:3,alcohol:3,aroma:3},
+ where:"San Rafael (tradicional) · base de espumantes económicos · hoy viñas viejas de alta gama",
+ place:"Полуароматный, отражает место. В Аргентине — основа массовых игристых Юга Мендосы.",
+ wood:"Разный: от acero до бочки; бывает сухим, полусухим, игристым.",
+ tells:["Яблоко + айва","Высокая кислотность при среднем теле","С возрастом — ланолин, «мокрая шерсть»"],
+ vs:[["Chardonnay","нейтральнее, кислоты меньше"],["Semillón","воск и мёд, кислота ниже"]],
+ taller:[]},
+{id:"semillon",z:[["Frío", "Alto Valle, Tupungato alto", "lima, pomelo, hierbas"], ["Templado–cálido", "Mendoza", "pera, durazno, cera; viñas viejas → miel"]],r:"ar",n:"Semillón",t:"blanco",glass:"#E9D27E",col:"amarillo; dorado con guarda",
+ ar:["lima","pomelo","hierbas","pera","cera"],
+ more:["miel (с выдержкой)","nuez","durazno blanco"],
+ s:{acidez:2.5,cuerpo:4,alcohol:3.5,aroma:2.5},
+ where:"Tupungato y Alto Valle del Río Negro (viñas viejas) · Mendoza — base del blanco 1930–1950",
+ place:"Старые лозы дают текстуру и воск; молодой — цитрус и травы.",
+ wood:"Хорошо с бочкой, обычно старой, и bâtonnage.",
+ tells:["Тело выше, кислота мягче","Цитрус + травы, потом воск","С годами — мёд и орех"],
+ vs:[["Chardonnay","масло и ваниль, если была бочка"],["Chenin Blanc","айва, кислота выше"]],
+ taller:["Bodegas López Semillón 2026"]},
+{id:"viognier",z:[["Altura", "Valle de Uco", "jazmín, azahar, durazno blanco"], ["Cálido", "Maipú, Este", "damasco maduro, ananá, mango, miel"]],r:"ar",n:"Viognier",t:"blanco",glass:"#E8C860",col:"amarillo dorado",
+ ar:["damasco","durazno","jazmín","azahar","jengibre"],
+ more:["ananá, mango (calor)","miel","vainilla (fermentado en barrica)"],
+ s:{acidez:2,cuerpo:4,alcohol:4,aroma:4.5},
+ where:"Mendoza (Maipú, Valle de Uco) — немного; также в купажах",
+ place:"Нужна поздняя зрелость: в тепле — экзотика и алкоголь, в высоте — больше цветов.",
+ wood:"Брожение в бочке предпочтительнее долгой выдержки.",
+ tells:["Абрикос и персик + цветы","Кислота низкая, алкоголь высокий","Маслянистое тело"],
+ vs:[["Torrontés","виноград и роза, легче"],["Chardonnay","меньше цветов и косточковых"]],
+ taller:["Santa Julia Flores Blancas Viognier 2025"]},
+{id:"torrontes",z:[["Altura", "Cafayate, Valles Calchaquíes 1.700 m+", "azahar, jazmín, pomelo, lima; fresco"], ["Valles más cálidos", "Famatina, Chilecito, Catamarca", "rosa, uva madura, durazno; más alcohol y amargor"]],r:"ar",n:"Torrontés Riojano",t:"blanco",glass:"#F1E7A6",col:"amarillo pálido, reflejos verdosos",
+ ar:["rosa","azahar","jazmín","uva fresca","pomelo rosado"],
+ more:["geranio","durazno blanco","lima","leve amargor al final"],
+ s:{acidez:2.5,cuerpo:3,alcohol:4,aroma:5},
+ where:"Valles Calchaquíes (Cafayate) · La Rioja (Famatina, Chilecito) · Catamarca",
+ place:"Высота (Cafayate 1.700 м) держит свежесть; ниже и в жару — больше спелого фрукта.",
+ wood:"Почти всегда без бочки: acero.",
+ tells:["Нос «взрывается» цветами и виноградом","Во рту суше, чем обещает нос","Лёгкая горчинка в финале"],
+ vs:[["Gewürztraminer","личи, маслянистее"],["Moscatel","виноград, но меньше цветов, часто сладкий"],["Viognier","абрикос, тело больше"]],
+ taller:["Santa Julia La Oveja Torrontés Natural 2024"]},
+{id:"moscatel",z:[["Cálido", "San Juan, Este, La Rioja", "uva madura, pasas, miel, durazno"]],r:"ar",n:"Moscateles",t:"blanco",glass:"#EED98C",col:"amarillo; ámbar en fortificados",
+ ar:["uva fresca","azahar","fruta blanca madura","durazno","miel"],
+ more:["rosa","pasas (dulces)","lichi"],
+ s:{acidez:2.5,cuerpo:3,alcohol:3.5,aroma:5},
+ where:"San Juan · Mendoza · La Rioja — Moscatel de Alejandría: вина, мистели, сладкие",
+ place:"В Аргентине чаще сладкие и креплёные (mistelas), реже сухие.",
+ wood:"Обычно без бочки.",
+ tells:["Пахнет свежим виноградом","Часто сладкий или креплёный","Цветок апельсина"],
+ vs:[["Torrontés","больше розы, сухой, горчинка"]],
+ taller:[]},
+{id:"pinotgris",z:[["Frío", "Chubut, Costa Atlántica", "pera, manzana verde, cítricos"], ["Templado", "Valle de Uco", "pera madura, melón, especias suaves"]],r:"ar",n:"Pinot Gris",t:"blanco",glass:"#E6D394",col:"amarillo pálido; a veces cobrizo",
+ ar:["pera","manzana verde","melón","cítricos","flores blancas"],
+ more:["humo (estilo Alsacia)","especias suaves","miel"],
+ s:{acidez:3,cuerpo:3,alcohol:3.5,aroma:3},
+ where:"Patagonia (Chubut) · Valle de Uco · Costa Atlántica — немного",
+ place:"Холод → лёгкий и свежий (стиль Grigio); тепло → объёмнее (стиль Gris).",
+ wood:"Редко новая бочка.",
+ tells:["Груша + дыня","Средняя кислотность, мягкий","Бывает медный оттенок"],
+ vs:[["Chardonnay","нейтральнее, бочка"],["Pinot Grigio итал.","легче — стиль, не сорт"]],
+ taller:[]},
+{id:"gewurz",z:[["Frío", "Trevelin, Chubut", "lichi, rosa, pomelo; fresco"], ["Templado–cálido", "Mendoza", "lichi maduro, ananá, miel; más untuoso"]],r:"ar",n:"Gewürztraminer",t:"blanco",glass:"#EBCB6A",col:"amarillo dorado",
+ ar:["lichi","rosa","jengibre","durazno","especias dulces"],
+ more:["ananá","miel"],
+ s:{acidez:2,cuerpo:4,alcohol:4,aroma:5},
+ where:"Patagonia (Trevelin, Chubut) · Valle de Uco · Costa Atlántica — немного",
+ place:"В холоде Патагонии — свежее и сухое; в тепле — маслянистее.",
+ wood:"Почти всегда varietal, без FML.",
+ tells:["Личи + роза — узнаётся сразу","Кислота низкая","Маслянистый, «жирный» рот"],
+ vs:[["Torrontés","виноград и цитрус, суше"],["Viognier","абрикос вместо личи"]],
+ taller:["Твоя дегустация 19.09: Contra Corriente Gewürztraminer (Trevelin)"]},
+/* ===== TINTAS ===== */
+{id:"pinotnoir",z:[["Frío", "Patagonia, Chapadmalal", "frambuesa, frutilla fresca, cereza, terroso, hojas"], ["Altura", "Tupungato, Gualtallary", "cereza, frambuesa, canela; más estructura"], ["Cálido", "(se evita)", "frutilla madura, mermelada; pierde frescura"]],r:"ar",n:"Pinot Noir",t:"tinto",glass:"#8A2A35",col:"rubí pálido",
+ ar:["cereza","frambuesa","frutilla","canela","notas terrosas"],
+ more:["sotobosque, cuero (con guarda)","hongos","rosa"],
+ s:{acidez:4,tanino:2,cuerpo:2.5,alcohol:3},
+ where:"Patagonia — «la cepa de la Patagonia» (Alto Valle, Neuquén, Chubut) · Tupungato · Chapadmalal",
+ place:"Только прохлада: широта Патагонии или высота Uco. Основа качественных игристых.",
+ wood:"Обычно старая французская бочка.",
+ tells:["Бледный цвет, пальцы видно","Красная ягода + земля","Танин шёлковый, кислота свежая"],
+ vs:[["Garnacha","больше алкоголя, белый перец"],["Criolla","проще, ещё легче"]],
+ taller:["Malma Comahue Estate Pinot Noir 2024 (Neuquén)"]},
+{id:"cs",z:[["Frío", "Patagonia, Uco alto", "pimiento verde, hoja de tomate, aceituna, casis fresco, menta"], ["Templado", "Luján (Perdriel, Vistalba), Maipú", "casis, ciruela, pimiento rojo, pimienta negra"], ["Norte de altura", "Cafayate", "pimiento rojo marcado, especias; taninos potentes"], ["Cálido", "San Juan, Este", "mermelada de ciruela, fruta madura; menos pirazinas"]],r:"ar",n:"Cabernet Sauvignon",t:"tinto",glass:"#3A0F1F",col:"rubí profundo, intensidad alta",
+ ar:["casis","grosella negra","pimiento rojo","pimienta negra","ciruela"],
+ more:["hoja de tomate, aceituna (frío, Patagonia)","eucalipto, menta","cedro, tabaco, grafito (madera)","mermelada (calor)"],
+ s:{acidez:3.5,tanino:4.5,cuerpo:4.5,alcohol:4},
+ where:"Luján (Perdriel, Vistalba) · Maipú (Lunlunta) · Valle de Uco · San Juan · Salta · Río Negro",
+ place:"Холод → пиразины (лист томата, оливка), тепло → слива и красный перец. Холод Юга даёт свежесть.",
+ wood:"Почти всегда бочка, часто 12–18 мес.",
+ tells:["Casis + перец или лист томата","Танин высокий, «с углами» — сушит дёсны","Полное тело, долгое послевкусие"],
+ vs:[["Cabernet Franc","легче, красная ягода, графит"],["Merlot","слива и кожа, мягче"]],
+ taller:["Doña Paula Altitude 1050 CS 2022","Humberto Canale Íntimo CS 2020 — Cami: «fluido, ya en su mejor momento»","Trapiche Gran Medalla CS 2019 — Cami: eucalipto, pimienta verde, cacao, tanino alto","В купажах: Tensión La Ribera, Luca Beso de Dante"]},
+{id:"cf",z:[["Frío", "Balcarce, Patagonia", "frambuesa, morrón, hoja de tomate, hierbas"], ["Altura", "Gualtallary, Los Chacayes", "frambuesa, cereza, grafito, violeta"], ["Cálido", "San Juan, zonas bajas", "ciruela, mora madura; menos vegetal"]],r:"ar",n:"Cabernet Franc",t:"tinto",glass:"#5A1630",col:"rubí o violáceo, media–alta",
+ ar:["frambuesa","morrón rojo","hoja de tomate","grafito","cereza"],
+ more:["pimienta","tomillo, laurel (herbal)","violeta","ciruela madura (zonas cálidas)"],
+ s:{acidez:3.5,tanino:3,cuerpo:3,alcohol:3.5},
+ where:"Valle de Uco (Gualtallary, Los Chacayes) — бум · San Juan · Río Negro · Balcarce",
+ place:"В холоде — малина, травы, свежая кислота (Bravento). В Uco — сочный, минеральный.",
+ wood:"Любит бочку, но часто бродит в стали или бетоне ради фрукта.",
+ tells:["Малина + болгарский перец","Графит, «карандашная стружка»","Танин средний, тонкий"],
+ vs:[["Cabernet Sauvignon","casis, танин выше"],["Malbec","фиалка и слива, меньше трав"]],
+ taller:["Kindgard Copleras CF 2023","Pyros Block N°2 CF 2023","В купажах: Bravento (Cami: frambuesa, morrón, acidez alta), La Cayetana, Tensión La Ribera"]},
+{id:"merlot",z:[["Frío", "Alto Valle del Río Negro", "ciruela fresca, frutilla, hoja de tomate"], ["Cálido", "Mendoza", "ciruela madura, mermelada, chocolate"]],r:"ar",n:"Merlot",t:"tinto",glass:"#4E1428",col:"rubí, intensidad media–alta",
+ ar:["ciruela","mora","frutilla","chocolate","hoja de tomate"],
+ more:["cuero (Cami: «típico del Merlot»)","terroso","mermelada de tomate"],
+ s:{acidez:3,tanino:2.5,cuerpo:3.5,alcohol:3.5},
+ where:"Alto Valle del Río Negro — больше всего в стране, старые лозы · Mendoza",
+ place:"Прохлада Патагонии даёт свежесть; в тепле — мягкая слива и шоколад.",
+ wood:"Французский и американский дуб; смягчает купажи.",
+ tells:["Слива + шоколад","Танин шёлковый, мягкий","Кожа на фоне"],
+ vs:[["Cabernet Sauvignon","casis, танин твёрже"],["Malbec","фиалка, цвет темнее"]],
+ taller:["Humberto Canale Estate 1909 Merlot 2024","В купаже: La Cayetana (20 %)"]},
+{id:"syrah",z:[["Altura", "Pedernal, Valle de Uco", "pimienta negra, violeta, arándano, grafito"], ["Cálido", "Tulum, Este de Mendoza", "mora madura, mermelada, especias dulces, regaliz"]],r:"ar",n:"Syrah",t:"tinto",glass:"#3E1030",col:"violáceo o rubí profundo",
+ ar:["pimienta negra","mora","ciruela","violeta","clavo de olor"],
+ more:["regaliz","ahumado, cárnico","grafito (Pedernal)","arándano"],
+ s:{acidez:3,tanino:3.5,cuerpo:4,alcohol:4},
+ where:"San Juan (Pedernal, Tulum) · Este de Mendoza · Valle de Uco",
+ place:"В высокогорном Pedernal — перец, графит, свежесть; в Tulum — спелая ягода, мягче.",
+ wood:"Долгая мацерация, французский или американский дуб.",
+ tells:["Чёрный перец — главный маркер","Чёрная ягода + фиалка","Танин плотнее, чем у Malbec"],
+ vs:[["Malbec","фиалка и слива, без перца, танин мягче"],["Garnacha","светлее, белый перец"]],
+ taller:["Pyros Valle del Pedernal Syrah 2023 — вино simulacro","В купажах: La Cayetana, Lindaflor (20 %)"]},
+{id:"malbec",z:[["Frío", "Patagonia", "frutilla, cereza, frambuesa; fruta roja fresca"], ["Altura", "Altamira, Gualtallary, Los Chacayes", "violeta, ciruela fresca, cereza negra, mineral"], ["Templado", "Luján (Agrelo), Maipú", "ciruela madura, mora, chocolate"], ["Norte de altura", "Cafayate", "mora madura, especias, pimentón; taninos altos"]],r:"ar",n:"Malbec",t:"tinto",glass:"#4A1236",col:"violáceo intenso; rubí con la edad",
+ ar:["ciruela","violeta","mora","cereza","pimienta rosa"],
+ more:["frutilla (zonas cálidas)","vainilla, chocolate (madera)","grafito, mineral (Altamira, altura)","fruta roja fresca (Patagonia)"],
+ s:{acidez:3,tanino:3,cuerpo:4,alcohol:4},
+ where:"Luján de Cuyo y Valle de Uco — эпицентры · Salta — мощнее · Patagonia — элегантнее",
+ place:"Высота (800–1.500 м): фиалка, свежесть, яркий цвет. Север: больше танина. Юг: красный фрукт.",
+ wood:"Пластичен: acero, бетон, яйца, бочка.",
+ tells:["Тёмный violáceo с фиолетовой кромкой","Слива + фиалка","Танин «круглый», мягкий"],
+ vs:[["Syrah","чёрный перец, танин твёрже"],["Bonarda","сочная ягода, проще, без фиалки"]],
+ taller:["Doña Paula El Alto Malbec 2024","Revancha «Peón» Malbec 2012 — evolucionado","Lindaflor Malbec-Syrah 2010 — Cami: confitado, anís estrellado, balsámico"]},
+{id:"bonarda",z:[["Cálido", "Este de Mendoza, San Juan", "frutilla madura, ciruela, mermelada"], ["Más fresco / altura", "Valle de Uco", "frambuesa, cereza, notas herbales"]],r:"ar",n:"Bonarda",t:"tinto",glass:"#45103A",col:"violáceo profundo",
+ ar:["frutilla","frambuesa","ciruela","rosa","notas herbales sutiles"],
+ more:["cereza","mora","mermelada (madura)"],
+ s:{acidez:3,tanino:2.5,cuerpo:3,alcohol:3.5},
+ where:"Zona Este de Mendoza — дом сорта · también San Juan",
+ place:"Вторая красная по площади в Аргентине; любит тепло и солнце.",
+ wood:"Молодой (иногда карбоническая мацерация) или с бочкой.",
+ tells:["Очень тёмный цвет, но танин мягкий","Сочная красная ягода","Проще и «питкий»"],
+ vs:[["Malbec","фиалка, структура больше"]],
+ taller:[]},
+{id:"tempranillo",r:"ar",n:"Tempranillo",t:"tinto",glass:"#5A1A2C",col:"rubí; teja con guarda",
+ ar:["frutilla","cereza","especias","cuero","hoja de tabaco"],
+ more:["vainilla, coco (roble americano)","ciruela"],
+ s:{acidez:3,tanino:3,cuerpo:3.5,alcohol:3.5},
+ where:"Mendoza (Este, Valle de Uco), San Juan — немного; молодые и структурные",
+ place:"Испанский сорт; в Аргентине — простые молодые вина и единичные премиальные.",
+ wood:"Американский дуб (стиль Риохи) или французский.",
+ tells:["Клубника + кожа + табак","Ваниль и кокос, если американский дуб","Средняя структура"],
+ vs:[["Sangiovese","кислее, вишня и чай"]],
+ taller:[], low:true},
+{id:"garnacha",z:[["Altura", "Valle de Uco", "frambuesa, frutilla fresca, flores, pimienta blanca"], ["Cálido", "Salta y zonas cálidas", "fruta pasa, mermelada; más alcohol"]],r:"ar",n:"Garnacha",t:"tinto",glass:"#8C2B30",col:"rubí pálido",
+ ar:["frambuesa","frutilla","pimienta blanca","fruta pasa","hierbas secas"],
+ more:["regaliz","flores"],
+ s:{acidez:2.5,tanino:2.5,cuerpo:3.5,alcohol:4},
+ where:"Valle de Uco · Salta — недавний рост",
+ place:"Любит жару и засуху; в Аргентине — новый стиль, часто натуральные вина.",
+ wood:"Старая бочка.",
+ tells:["Бледный цвет, но алкоголь высокий","Малина + белый перец","Мягкий танин, щедрое тело"],
+ vs:[["Pinot Noir","кислее, легче, без белого перца"]],
+ taller:["Aleanna (El Enemigo) Amiguito Garnacha 2024 — натуральное"]},
+{id:"sangiovese",r:"ar",n:"Sangiovese",t:"tinto",glass:"#6A1C28",col:"rubí, intensidad media",
+ ar:["cereza roja ácida","frambuesa","ciruela","tierra húmeda","hoja de té"],
+ more:["hierbas secas"],
+ s:{acidez:4,tanino:3.5,cuerpo:3,alcohol:3.5},
+ where:"Mendoza — Аргентина вторая страна вне Европы по площади",
+ place:"Итальянский сорт; в Аргентине — наследие иммиграции.",
+ wood:"Разная; часто в купажах.",
+ tells:["Высокая кислота у красного","Кислая вишня + чай","Танин твёрдый, но элегантный"],
+ vs:[["Tempranillo","клубника и кожа, кислота ниже"]],
+ taller:[], low:true},
+{id:"nebbiolo",r:"ar",n:"Nebbiolo",t:"tinto",glass:"#7A2A2A",col:"pálido, granate pronto",
+ ar:["rosa","violeta","cereza","alquitrán","regaliz"],
+ more:["pólvora","sotobosque"],
+ s:{acidez:4.5,tanino:5,cuerpo:4,alcohol:4},
+ where:"В Аргентине — единичные виноградники. Профиль — по мануалу (Barolo, Barbaresco)",
+ place:"Ароматика — мировой профиль, не аргентинский.",
+ wood:"Varietal, долгая выдержка.",
+ tells:["Бледный цвет, но танин и кислота очень высокие","Роза + дёготь","Кирпичный оттенок рано"],
+ vs:[["Pinot Noir","мягкий танин"]],
+ taller:[], low:true},
+{id:"zinfandel",r:"ar",n:"Zinfandel / Primitivo",t:"tinto",glass:"#3F1028",col:"rubí profundo",
+ ar:["fruta negra madura","mermelada","especias dulces","pasas","hierbas"],
+ more:[],
+ s:{acidez:2.5,tanino:3,cuerpo:4,alcohol:4.5},
+ where:"В Аргентине практически нет. Профиль — по мануалу (California, Puglia)",
+ place:"Ароматика — мировой профиль.",
+ wood:"Высокая гамма — американский дуб.",
+ tells:["Мармелад и изюм","Очень высокий алкоголь","Неравномерная зрелость гроздей"],
+ vs:[["Garnacha","светлее, белый перец"]],
+ taller:[], low:true},
+{id:"pinotage",r:"ar",n:"Pinotage",t:"tinto",glass:"#4A1428",col:"rubí profundo",
+ ar:["cereza","mora","ahumado","terroso","alquitrán"],
+ more:[],
+ s:{acidez:3,tanino:3.5,cuerpo:3.5,alcohol:3.5},
+ where:"В Аргентине нет. Профиль — по мануалу (ЮАР: Pinot Noir × Cinsault)",
+ place:"Ароматика — мировой профиль.",
+ wood:"Разная.",
+ tells:["Дым и земля поверх ягоды","Много цвета","Танин твёрдый"],
+ vs:[["Pinot Noir","бледнее, без дыма"]],
+ taller:[], low:true},
+{id:"carmenere",r:"ar",n:"Carménère",t:"tinto",glass:"#3E1230",col:"violáceo profundo",
+ ar:["pimienta negra","pimiento verde","mora","arándano","fruta roja"],
+ more:["hierbas"],
+ s:{acidez:3,tanino:3,cuerpo:3.5,alcohol:4},
+ where:"В Аргентине очень мало. Эмблема Чили (Colchagua, Cachapoal)",
+ place:"Если не дозрел — очень выраженные пиразины.",
+ wood:"Осторожно с бочкой.",
+ tells:["Зелёный перец + чёрный перец","Танин мягче, чем у CS","Долго путали с Merlot"],
+ vs:[["Merlot","без «зелени», шоколад"],["Cabernet Franc","малина и графит"]],
+ taller:[], low:true}
+];
+
+const LAB={acidez:"Acidez",tanino:"Taninos",cuerpo:"Cuerpo",alcohol:"Alcohol",aroma:"Aroma"};
+const W5=["baja","media−","media","media+","alta"];
+const lvl=v=>v<=1.5?0:v<=2.5?1:v<=3.5?2:v<=4?3:4;
+const WORD=(k,v)=>{const i=lvl(v);
+  if(k==="tanino")return["bajos","medios−","medios","medios+","altos"][i];
+  if(k==="cuerpo")return["ligero","medio−","medio","medio+","alto"][i];
+  if(k==="alcohol")return v<=2.5?"bajo":v<=3.5?"medio":"alto";
+  return W5[i];};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+let mode="full",filt="all",onlyAR=false,query="";
+
+function say(c){
+  const col=c.col.split(/[;,]/)[0].trim();
+  const a=c.ar.slice(0,4);const list=a.slice(0,-1).join(", ")+" y "+a[a.length-1];
+  if(c.t==="blanco")return `Vino blanco de color ${col}. En nariz, aromas a ${list}. En boca, entrada seca, acidez ${WORD("acidez",c.s.acidez)}, alcohol ${WORD("alcohol",c.s.alcohol)}, volumen ${WORD("cuerpo",c.s.cuerpo)}.`;
+  return `Vino tinto de color ${col}. En nariz, aromas a ${list}. En boca, entrada seca, acidez ${WORD("acidez",c.s.acidez)}, alcohol ${WORD("alcohol",c.s.alcohol)}, taninos ${WORD("tanino",c.s.tanino)}, cuerpo ${WORD("cuerpo",c.s.cuerpo)}.`;
+}
+function dots(v){let h='<span class="dots" aria-hidden="true">';for(let i=1;i<=5;i++)h+=`<i class="${i<=Math.round(v)?'on':''}"></i>`;return h+'</span>';}
+function visible(){return C.filter(c=>(filt==="all"||c.t===filt)&&(!onlyAR||!c.low)&&(!query||norm([c.n,...c.ar,...c.more,c.where,...(c.z||[]).flat()].join(" ")).includes(query)));}
+function render(){
+  const g=document.getElementById("grid");g.className="grid "+mode;
+  const list=visible();
+  document.getElementById("count").textContent=`${list.length} из ${C.length} сортов`;
+  g.innerHTML=list.map(c=>{
+    const st=Object.entries(c.s).map(([k,v])=>`<span>${LAB[k]}</span><span>${dots(v)} <span style="color:var(--muted)">${WORD(k,v)}</span></span>`).join("");
+    const tag=mode==="full"?"button":"div";
+    return `<${tag} class="card" data-id="${c.id}"${mode==="full"?` aria-label="Открыть ${esc(c.n)}"`:""}>
+      <div class="top"><span class="glass" style="background:${c.glass}"></span><div><div class="type ${c.t}">${c.t==="tinto"?"Tinta":"Blanca"}${c.low?'<span class="badge">мало в AR</span>':""}</div><div class="name">${esc(c.n)}</div></div></div>
+      <div class="k">${c.low?"Типичные ароматы":"Типично для Аргентины"}</div><div class="aro">${c.ar.map(a=>`<span>${esc(a)}</span>`).join("")}</div>
+      ${c.more.length?`<div class="second"><b>Ещё:</b> ${c.more.slice(0,3).map(esc).join(" · ")}</div>`:""}
+      ${c.z?`<div class="k">По зонам</div><div class="zones">${c.z.map(([z,p,ar])=>`<b>${esc(z)}</b><span>${esc(ar)}</span>`).join("")}</div>`:""}
+      <div class="k">Структура</div><div class="struct">${st}</div>
+      <div class="where"><b style="color:var(--ink)">AR:</b> ${esc(c.where)}</div>
+      <div class="more">Открыть карточку →</div>
+    </${tag}>`;}).join("")||'<p class="count">Ничего не найдено. Проверь написание — поиск не различает ударения.</p>';
+}
+function openSheet(id){
+  const c=C.find(x=>x.id===id);if(!c)return;
+  const bars=Object.entries(c.s).map(([k,v])=>`<span>${LAB[k]}</span><span class="track"><span style="width:${v*20}%"></span></span><span>${WORD(k,v)}</span>`).join("");
+  document.getElementById("sheet").innerHTML=`
+   <button class="x" id="close" aria-label="Закрыть">×</button>
+   <div class="type ${c.t}">${c.t==="tinto"?"Tinta":"Blanca"} · Argentina${c.low?'<span class="badge">мало в AR</span>':""}</div>
+   <h2 id="sh-name">${esc(c.n)}</h2>
+   <div class="sec"><div class="k">В бокале</div><p>${esc(c.col)}</p></div>
+   <div class="sec"><div class="k">${c.low?"Типичные ароматы (мировой профиль)":"Типично для Аргентины"}</div><div class="arlist">${c.ar.map(a=>`<span>${esc(a)}</span>`).join("")}</div></div>
+   ${c.z?`<div class="sec"><div class="k">Как меняется по зонам</div><div class="zfull">${c.z.map(([z,p,ar])=>`<div><b>${esc(z)}</b> <small>· ${esc(p)}</small><br>${esc(ar)}</div>`).join("")}</div></div>`:""}
+   ${c.more.length?`<div class="sec"><div class="k">Второй план</div><ul class="t">${c.more.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}
+   <div class="sec"><div class="k">Структура (ориентир)</div><div class="bars">${bars}</div></div>
+   <div class="sec"><div class="k">Где в Аргентине</div><p>${esc(c.where)}</p><p>${esc(c.place)}</p></div>
+   <div class="sec"><div class="k">Бочка и технология</div><p>${esc(c.wood)}</p></div>
+   <div class="sec"><div class="k">Как узнать вслепую</div><ul class="t">${c.tells.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>
+   <div class="sec"><div class="k">С чем путают</div><ul class="t">${c.vs.map(([a,b])=>`<li><b>${esc(a)}</b> — ${esc(b)}</li>`).join("")}</ul></div>
+   ${c.taller.length?`<div class="sec anchor"><div class="k">Ты пил на taller</div><ul class="t">${c.taller.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}
+   <div class="sec"><div class="k">Заготовка для ficha</div><div class="say">${esc(say(c))}</div></div>`;
+  document.getElementById("scrim").hidden=false;document.getElementById("close").focus();
+}
+function closeSheet(){document.getElementById("scrim").hidden=true;}
+document.getElementById("scrim").addEventListener("click",e=>{if(e.target.id==="scrim"||e.target.id==="close")closeSheet();});
+addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet();});
+document.getElementById("grid").addEventListener("click",e=>{if(mode!=="full")return;const c=e.target.closest(".card");if(c)openSheet(c.dataset.id);});
+function setMode(m){mode=m;document.getElementById("md-mini").setAttribute("aria-pressed",m==="mini");document.getElementById("md-full").setAttribute("aria-pressed",m==="full");render();}
+document.getElementById("md-mini").onclick=()=>setMode("mini");
+document.getElementById("md-full").onclick=()=>setMode("full");
+document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{filt=b.dataset.f;document.querySelectorAll("[data-f]").forEach(x=>x.setAttribute("aria-pressed",x===b));render();});
+document.getElementById("lowbtn").onclick=e=>{onlyAR=!onlyAR;e.currentTarget.setAttribute("aria-pressed",onlyAR);render();};
+document.getElementById("q").addEventListener("input",e=>{const v=norm(e.target.value.trim());query=v.length>=2?v:"";render();});
+
+/* quiz */
+let qOn=false;
+function newQ(){
+  const pool=C.filter(c=>(filt==="all"||c.t===filt)&&!c.low);
+  const ans=pool[Math.floor(Math.random()*pool.length)];
+  const same=pool.filter(x=>x!==ans&&x.t===ans.t);
+  const opts=[ans,...same.sort(()=>Math.random()-.5).slice(0,3)].sort(()=>Math.random()-.5);
+  const q=document.getElementById("quiz");
+  q.innerHTML=`<div class="qcard"><div class="k">Тренировка вслепую · ${ans.t==="tinto"?"tinto":"blanco"}</div>
+   <h2>Какой это сорт?</h2>
+   <ul class="t"><li>В бокале: ${esc(ans.col)}</li><li>Нос: ${esc(ans.ar.slice(0,3).join(", "))}</li>${ans.tells.slice(1).map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+   <div class="qopts">${opts.map(o=>`<button class="qb" data-a="${o.id}">${esc(o.n)}</button>`).join("")}</div>
+   <div class="qfb" id="qfb" aria-live="polite"></div></div>`;
+  q.querySelectorAll(".qb").forEach(b=>b.onclick=()=>{
+    q.querySelectorAll(".qb").forEach(x=>{x.disabled=true;if(x.dataset.a===ans.id)x.classList.add("right");});
+    const fb=document.getElementById("qfb");
+    if(b.dataset.a===ans.id)fb.innerHTML=`Верно. <button class="qb" id="nxt" style="padding:4px 10px">Следующий</button>`;
+    else{b.classList.add("wrong");const w=C.find(x=>x.id===b.dataset.a);const v=ans.vs.find(p=>p[0]===w.n);
+      fb.innerHTML=`Это ${esc(ans.n)}.${v?` Отличие от ${esc(w.n)}: ${esc(v[1])}.`:""} <button class="qb" id="nxt" style="padding:4px 10px">Следующий</button>`;}
+    document.getElementById("nxt").onclick=newQ;});
+}
+document.getElementById("qz").onclick=()=>{qOn=!qOn;const q=document.getElementById("quiz");q.hidden=!qOn;document.getElementById("qz").setAttribute("aria-pressed",qOn);if(qOn)newQ();};
+render();
+</script>
+</html>

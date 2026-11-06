@@ -1,0 +1,225 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="robots" content="noindex, nofollow"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Atlas vitivinícola argentino</title><style>body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout: a north→south strip like a topographic section — latitude rail on the left, Andes edge marked, provinces stacked by latitude, each split into zones → IG / localidades / bodegas */
+:root{
+  --bg:#F2F4F1; --panel:#FFFFFF; --ink:#1E2622; --muted:#5F6B64; --rule:#D3D9D4;
+  --ig:#7B1E33; --ig-ink:#FFFFFF; --loc:#7B1E33; --river:#1F6FA8; --river-bg:#E3EFF8;
+  --alt:#9A6B2F; --hl:#F5D76E; --andes:#B9A88A;
+  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141917; --panel:#1C2320; --ink:#E6ECE8; --muted:#9AA79F; --rule:#2F3A35;
+  --ig:#C9566F; --ig-ink:#170A0E; --loc:#E58A9E; --river:#6CB4E8; --river-bg:#16303F;
+  --alt:#D6A55E; --hl:#8A6F12; --andes:#5E5444; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141917; --panel:#1C2320; --ink:#E6ECE8; --muted:#9AA79F; --rule:#2F3A35;
+  --ig:#C9566F; --ig-ink:#170A0E; --loc:#E58A9E; --river:#6CB4E8; --river-bg:#16303F;
+  --alt:#D6A55E; --hl:#8A6F12; --andes:#5E5444; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45}
+.wrap{max-width:1100px;margin:0 auto;padding-block:24px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(30px,5vw,44px);letter-spacing:.01em;margin:0;text-wrap:balance}
+.lead{color:var(--muted);margin:4px 0 16px;max-width:65ch}
+.tools{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;border-bottom:1px solid var(--rule)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+#q{flex:1 1 260px;min-width:0;font:inherit;padding:9px 12px;border:1px solid var(--rule);border-radius:6px;background:var(--panel);color:var(--ink)}
+#q:focus{outline:2px solid var(--river);outline-offset:1px}
+#hit{font-size:13px;color:var(--muted);flex:1 1 100%}
+#hit b{color:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12.5px;color:var(--muted);margin:12px 0 4px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.map{display:grid;grid-template-columns:54px 1fr;gap:0 14px;margin-top:14px}
+.rail{position:relative;border-right:3px solid var(--andes)}
+.rail::after{content:"Cordillera — OESTE";position:absolute;top:8px;right:-3px;writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--f-display);font-size:12px;letter-spacing:.2em;color:var(--muted);padding:6px 0;background:var(--bg)}
+.regions{display:flex;flex-direction:column;gap:22px;min-width:0}
+.region h2{font-family:var(--f-display);font-weight:600;font-size:15px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;display:flex;align-items:baseline;gap:10px}
+.region h2 .lat{font-variant-numeric:tabular-nums;letter-spacing:.04em;color:var(--alt)}
+.provs{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.prov{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;min-width:0}
+.prov h3{font-family:var(--f-display);font-weight:700;font-size:22px;margin:0;line-height:1.1}
+.meta{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:12.5px;color:var(--muted);margin:4px 0 8px}
+.river{color:var(--river);background:var(--river-bg);border-radius:3px;padding:0 6px;font-weight:600}
+.altm{color:var(--alt);font-weight:600;font-variant-numeric:tabular-nums}
+.zone{border-top:1px dashed var(--rule);padding-top:7px;margin-top:7px}
+.zone h4{margin:0 0 5px;font-size:13px;font-weight:700;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline}
+.zone h4 .sub{font-weight:400;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.c{font-size:12.5px;border-radius:3px;padding:1px 7px;line-height:1.5}
+.c.ig{background:var(--ig);color:var(--ig-ink);font-weight:600}
+.c.loc{border:1px solid var(--loc);color:var(--loc)}
+.bod{font-size:12.5px;color:var(--muted);margin-top:5px}
+.bod b{color:var(--ink);font-weight:600}
+.note{font-size:12px;color:var(--muted);margin-top:6px;font-style:italic}
+.dim .prov:not(.match){opacity:.28}
+.dim .zone:not(.match){opacity:.35}
+mark{background:var(--hl);color:inherit;border-radius:2px;padding:0 1px}
+.traps{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px 16px;margin-top:26px}
+.traps h2{font-family:var(--f-display);font-size:20px;margin:0 0 6px}
+.traps ul{margin:0;padding-left:18px;max-width:80ch}
+.traps li{margin:3px 0}
+footer{font-size:12px;color:var(--muted);margin-top:18px;max-width:80ch}
+@media (max-width:520px){.map{grid-template-columns:20px 1fr;gap:0 8px}.rail::after{display:none}.provs{grid-template-columns:1fr}}
+</style>
+
+<div class="wrap">
+  <h1>Atlas vitivinícola argentino</h1>
+  <p class="lead">Esquema de «quién está dónde»: las regiones van de norte a sur, con la cordillera a la izquierda. Dentro de cada provincia: zona o departamento → IG → localidades → bodegas → río. Escribí un nombre y el atlas te muestra dónde está.</p>
+
+  <div class="tools">
+    <input id="q" type="search" placeholder="Bodega, IG, pueblo o río — p. ej. Altamira, Colomé, Diamante" autocomplete="off" aria-label="Buscar en el atlas">
+    <div id="hit">Probá con <b>Chacayes</b> o <b>Esteco</b>.</div>
+  </div>
+
+  <div class="legend">
+    <span><span class="c ig">IG</span> IG según el listado del INV</span>
+    <span><span class="c loc">localidad</span> localidad o zona, no es IG</span>
+    <span><span class="river">río</span> río que la riega</span>
+    <span><span class="altm">1.700 m</span> altitud</span>
+  </div>
+
+  <div class="map">
+    <div class="rail" aria-hidden="true"></div>
+    <div class="regions" id="regions"></div>
+  </div>
+
+  <section class="traps">
+    <h2>Nombres repetidos y trampas</h2>
+    <ul>
+      <li><b>San Carlos</b> es IG en Mendoza (Valle de Uco) y también en Salta (Valles Calchaquíes).</li>
+      <li><b>San Javier</b> es IG en Córdoba (Traslasierra); no confundir con el Valle Inferior de Río Negro.</li>
+      <li><b>25 de Mayo</b> está en La Pampa, sobre el río Colorado. <b>Sarmiento</b> está en Chubut (Otronia).</li>
+      <li><b>Zonda</b> es un viento y también un valle e IG de San Juan.</li>
+      <li><b>Valle de Uco</b> y <b>Valles Calchaquíes</b> son IG «paraguas» que abarcan varios departamentos.</li>
+      <li><b>Gualtallary, Alto Agrelo, Perdriel, Colomé y Tolombón</b> son lugares famosos, pero no figuran como IG en el listado del INV (abril de 2024).</li>
+      <li><b>Los Chacayes y Vista Flores</b> están en Tunuyán, no en Tupungato. <b>La Consulta</b> está en San Carlos.</li>
+      <li>Ríos de Mendoza: <b>Mendoza</b> → Norte y Zona Alta · <b>Tunuyán</b> → Uco y Este · <b>Diamante y Atuel</b> → Sur.</li>
+      <li>Salta: el <b>Calchaquí</b> baja del norte y el <b>Santa María</b> sube del sur; cerca de Cafayate se unen y forman el <b>río de las Conchas</b>.</li>
+    </ul>
+  </section>
+
+  <footer>Esquema sin escala: las latitudes son aproximadas. IG según el listado oficial del INV (abril de 2024) y el manual de Geografía Vitivinícola de CAVE. Si una fuente no coincide con el listado del INV, manda el INV.</footer>
+</div>
+
+<script>
+const R=[
+{n:"Noroeste · NOA",lat:"22–28° S",p:[
+ {n:"Jujuy",alt:"hasta 3.329 m",riv:"río Grande",z:[
+  {n:"Quebrada de Humahuaca",ig:["Jujuy","Quebrada de Humahuaca"],loc:["Maimará","Uquía","Tilcara"],b:["Fernando Dupont (Maimará)","Amanecer Andino","Uquía","El Bayeh"]}]},
+ {n:"Salta",alt:"1.700–3.111 m",riv:"Calchaquí (N) + Santa María (S) → Las Conchas",z:[
+  {n:"Norte del valle",sub:"La Poma → Cachi",ig:["Cachi"],loc:["La Poma","Payogasta (3.111 m)"],b:["Payogasta"]},
+  {n:"Molinos",ig:["Molinos"],loc:["Colomé","Angastaco"],b:["Colomé (1831, biodinámica)","Tacuil (Dávalos)"]},
+  {n:"San Carlos",ig:["San Carlos"],loc:["Animaná"],b:[]},
+  {n:"Cafayate",sub:"mayor producción",ig:["Cafayate – Valle de Cafayate","Valles Calchaquíes"],loc:["Yacochuya","Tolombón"],b:["El Esteco","Etchart","Domingo Hnos.","El Porvenir","Piattelli","Amalaya","Finca Quara","El Tránsito","Vasija Secreta","Utama","San Pedro de Yacochuya (Rolland)","Finca Las Nubes","Los Cardones (Tolombón)"]}]},
+ {n:"Tucumán",alt:"1.700–2.200 m",riv:"río Santa María",z:[
+  {n:"Valles Calchaquíes tucumanos",ig:["Tucumán","Tafí"],loc:["Colalao del Valle","Amaicha del Valle"],b:["Los Amaicha","Las Arcas de Tolombón"]}]},
+ {n:"Catamarca",alt:"1.200–2.400 m",riv:"Santa María (N) · Abaucán (SO)",z:[
+  {n:"Norte",sub:"Valles Calchaquíes",ig:["Santa María"],loc:["Chañar Punco"],b:["El Esteco – Chañar Punco","Altos de Yocavil"]},
+  {n:"Sudoeste",sub:"~70 % de la provincia",ig:["Tinogasta","Fiambalá"],loc:[],b:["Alta Esperanza (Tinogasta)","Don Diego (Fiambalá)","Cabernet de los Andes (Fiambalá)"]},
+  {n:"Centro",ig:["Belén","Pomán","Catamarca"],loc:[],b:["Gualfín (Belén)"]}]}
+]},
+{n:"Cuyo",lat:"28–37° S",p:[
+ {n:"La Rioja",alt:"900–1.400 m",riv:"deshielo, entre Velasco y Famatina",z:[
+  {n:"Valles de Famatina",ig:["La Rioja Argentina","Valles de Famatina","Chilecito","Valle de Chañarmuyo"],loc:["Nonogasta","Anillaco","Aminga"],b:["La Riojana (Chilecito, Fair Trade)","Nader","Fincas Riojanas","Valle de la Puerta","Chañarmuyo","San Huberto (Anillaco)"]}]},
+ {n:"San Juan",alt:"600–1.730 m",riv:"río San Juan (dique de Ullum)",z:[
+  {n:"Tulum",sub:"~80 % · 550–850 m",ig:["San Juan","Tulum"],loc:[],b:["Graffigna","Callia","A. Pulenta","Casa Montes","Las Marianas"]},
+  {n:"Ullum y Zonda",ig:["Ullum","Zonda","La Ciénaga"],loc:[],b:["Xumek (Zonda)"]},
+  {n:"Pedernal",sub:"1.100–1.500 m · goteo",ig:["Pedernal"],loc:[],b:["Pyros","Finca Las Moras","Fuego Blanco"]},
+  {n:"Calingasta",sub:"1.350–1.730 m · arroyo Los Patos",ig:["Calingasta","Barreal","Paraje Hilario","Sorocayense","Tamberías"],loc:[],b:["Cara Sur (Barreal)","Entre Tapias","Los Dragones"]},
+  {n:"Otras zonas",ig:[],loc:["Jáchal","Iglesia","Valle Fértil"],b:[]}]},
+ {n:"Mendoza · Norte y Este",alt:"600–750 m",riv:"Norte: río Mendoza · Este: río Tunuyán",z:[
+  {n:"Norte",sub:"río Mendoza",ig:["Valle de Canota (Las Heras)"],loc:["Las Heras","Lavalle","Guaymallén"],b:[]},
+  {n:"Este",sub:"río Tunuyán · volumen",ig:[],loc:["San Martín","Junín","Rivadavia","Santa Rosa","La Paz","Reducción","Distrito Medrano"],b:["Santa Julia","Tittarelli","Nofal","Santa Ana","Altos Las Hormigas","Pascual Toso","Llaver","Crotta"]}],
+  note:"Santa Julia (Familia Zuccardi) tiene su bodega en Maipú; en el material aparece dentro del bloque Este."},
+ {n:"Mendoza · Zona Alta del Río Mendoza",alt:"750–1.100 m",riv:"río Mendoza",z:[
+  {n:"Luján de Cuyo",sub:"DOC Luján de Cuyo",ig:["Luján de Cuyo","Agrelo","Las Compuertas","Vistalba"],loc:["Perdriel","Chacras de Coria","Drummond","Ugarteche","Alto Agrelo"],b:["Catena Zapata (Agrelo)","Luigi Bosca","Norton (Perdriel)","Nieto Senetiner","Lagarde","Terrazas","Chandon","Doña Paula","Achával Ferrer","Viña Cobos","Weinert"]},
+  {n:"Maipú",ig:["Maipú","Lunlunta","Russell","El Paraíso","Barrancas"],loc:[],b:["Trapiche","Bodegas López","Santa Julia (Tensión La Ribera)"]}]},
+ {n:"Mendoza · Valle de Uco",alt:"900–1.700 m · la más alta",riv:"río Tunuyán",z:[
+  {n:"Tupungato",sub:"norte del valle",ig:["Valle de Uco","El Peral"],loc:["Gualtallary"],b:["Andeluna","Domaine Bousquet","Atamisque","Zorzal (Gualtallary)"]},
+  {n:"Tunuyán",sub:"centro",ig:["Vista Flores","Los Chacayes","San Pablo"],loc:[],b:["Salentein (San Pablo)","Clos de los Siete: Monteviejo, DiamAndes, Cuvelier, Rolland (Vista Flores)","Ver Sacrum, La Cayetana (Los Chacayes)","SuperUco","Lurton"]},
+  {n:"San Carlos",sub:"sur del valle",ig:["La Consulta","Paraje Altamira","Pampa El Cepillo","Cordón del Cepillo"],loc:[],b:["Zuccardi Piedra Infinita (Altamira)","La Celia","Trapiche Gran Medalla (viñedo La Consulta)","Luca (Altamira, El Cepillo)"]}]},
+ {n:"Mendoza · Sur",alt:"450–800 m",riv:"ríos Diamante y Atuel",z:[
+  {n:"San Rafael",sub:"DOC San Rafael (1993, sin uso)",ig:["San Rafael"],loc:[],b:["Bianchi","Suter","Mumm","Goyenechea","Alfredo Roca","Algodon","Balbi","Jean Rivier","Lavaque"]},
+  {n:"General Alvear",ig:["General Alvear"],loc:[],b:[]}]}
+]},
+{n:"Centro y Litoral",lat:"28–33° S",p:[
+ {n:"Córdoba",alt:"400–1.000 m",riv:"secano / sierras",z:[
+  {n:"Norte",ig:["Córdoba Argentina","Colonia Caroya","Colón","Cruz del Eje"],loc:[],b:["La Caroyense (Colonia Caroya)"]},
+  {n:"Traslasierra",sub:"800–1.000 m",ig:["San Javier"],loc:[],b:["El Noble de San Javier","Estancia Las Cañitas","Terra Camiare","La Matilde","Araoz de Lamadrid","Achala","Kirton"]}]},
+ {n:"San Luis",z:[{n:"",ig:["San Luis"],loc:[],b:[]}]},
+ {n:"Santiago del Estero",z:[{n:"",ig:[],loc:[],b:["Finca María del Pilar"]}]},
+ {n:"Entre Ríos",riv:"clima húmedo",z:[{n:"",ig:["Victoria"],loc:["Concordia"],b:[]}]}
+]},
+{n:"Patagonia",lat:"37–46° S",p:[
+ {n:"La Pampa",alt:"~330 m",riv:"río Colorado",z:[
+  {n:"",ig:[],loc:["25 de Mayo","Casa de Piedra"],b:["Bodega del Desierto (25 de Mayo)"]}]},
+ {n:"Neuquén",alt:"~370 m",riv:"río Neuquén",z:[
+  {n:"",ig:["Neuquén","Añelo"],loc:["San Patricio del Chañar"],b:["Del Fin del Mundo","Familia Schroeder","Malma","Secreto Patagónico","Patritti"]}]},
+ {n:"Río Negro",alt:"10–370 m",riv:"río Negro (Neuquén + Limay)",z:[
+  {n:"Alto Valle",ig:["Patagonia","Alto Valle del Río Negro","General Roca"],loc:["Fernández Oro","Villa Regina","Mainqué"],b:["Humberto Canale (Gral. Roca, 1909)","Noemía","Chacra","Del Río Elorza","Miras","Infinitus","Agrestis","Aniello","Wapisa"]},
+  {n:"Valle Medio",ig:["Avellaneda"],loc:["Choele Choel"],b:[]},
+  {n:"Valle Inferior",ig:["General Conesa"],loc:[],b:[]},
+  {n:"Río Colorado",ig:["Pichimahuida"],loc:[],b:[]}]},
+ {n:"Chubut",alt:"−8 a 35 °C",riv:"río Chubut",z:[
+  {n:"Cordillera",sub:"oeste",ig:["El Hoyo","Trevelin"],loc:[],b:["Casa Yagüe (Trevelin)","Nant y Fall (Trevelin)","Contra Corriente"]},
+  {n:"Centro",ig:["Sarmiento"],loc:["Paso del Sapo"],b:["Otronia (Sarmiento, 45 Rugientes)","Cielos de Gualjaina"]},
+  {n:"Costa",ig:[],loc:["Gaiman"],b:["Patagonia Wines","Rincón de los Leones"]}]}
+]},
+{n:"Costa Atlántica",lat:"37–39° S",p:[
+ {n:"Buenos Aires",alt:"casi nivel del mar",riv:"secano en la costa",z:[
+  {n:"Costa",ig:["Chapadmalal"],loc:["Mar del Plata"],b:["Costa & Pampa (Trapiche, 2009)"]},
+  {n:"Sierras de Tandilia",ig:["Balcarce","Tandil"],loc:[],b:["Puerta del Abra (Balcarce)","Cordón Blanco (Tandil)","Viñedo Horizonte (Tandil)"]},
+  {n:"Sierra de la Ventana y sur",ig:["Villa Ventana"],loc:["Médanos","Monte Hermoso","Punta Alta","Saldungaray"],b:["Cerro Colorado","Al Este (Médanos)"]},
+  {n:"Norte",ig:[],loc:["Cardales"],b:[]}]}
+]}
+];
+
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+function hl(t,q){ if(!q) return esc(t); const n=norm(t),i=n.indexOf(q); if(i<0) return esc(t);
+  return esc(t.slice(0,i))+"<mark>"+esc(t.slice(i,i+q.length))+"</mark>"+esc(t.slice(i+q.length)); }
+
+function render(q){
+  const box=document.getElementById("regions"); let html="", hits=[];
+  R.forEach(r=>{
+    html+=`<section class="region"><h2>${esc(r.n)} <span class="lat">${r.lat}</span></h2><div class="provs">`;
+    r.p.forEach(p=>{
+      let pm=false, zh="";
+      p.z.forEach(z=>{
+        const all=[z.n,z.sub||"",...z.ig,...z.loc,...z.b].join(" | ");
+        const zm=!!q && (norm(all).includes(q) || norm(p.riv||"").includes(q) || norm(p.n).includes(q));
+        if(zm){pm=true;}
+        if(q && norm(all).includes(q)){
+          [...z.ig,...z.loc,...z.b].filter(x=>norm(x).includes(q)).forEach(x=>hits.push(`<b>${esc(x)}</b> → ${esc(p.n)}${z.n?" › "+esc(z.n):""}`));
+        }
+        zh+=`<div class="zone${zm?" match":""}">${z.n?`<h4>${hl(z.n,q)}${z.sub?` <span class="sub">${hl(z.sub,q)}</span>`:""}</h4>`:""}
+          <div class="chips">${z.ig.map(x=>`<span class="c ig">${hl(x,q)}</span>`).join("")}${z.loc.map(x=>`<span class="c loc">${hl(x,q)}</span>`).join("")}</div>
+          ${z.b.length?`<div class="bod"><b>Bodegas:</b> ${z.b.map(x=>hl(x,q)).join(" · ")}</div>`:""}</div>`;
+      });
+      if(q && norm(p.riv||"").includes(q)) hits.push(`<b>${esc(p.riv)}</b> → ${esc(p.n)}`);
+      html+=`<article class="prov${pm?" match":""}"><h3>${hl(p.n,q)}</h3>
+        <div class="meta">${p.riv?`<span class="river">${hl(p.riv,q)}</span>`:""}${p.alt?`<span class="altm">${esc(p.alt)}</span>`:""}</div>
+        ${zh}${p.note?`<div class="note">${esc(p.note)}</div>`:""}</article>`;
+    });
+    html+=`</div></section>`;
+  });
+  box.innerHTML=html;
+  box.classList.toggle("dim",!!q);
+  const hit=document.getElementById("hit");
+  if(!q) hit.innerHTML="Probá con <b>Chacayes</b> o <b>Esteco</b>.";
+  else if(!hits.length) hit.textContent="No se encontró. Revisá cómo está escrito: la búsqueda no distingue mayúsculas ni tildes.";
+  else hit.innerHTML=[...new Set(hits)].slice(0,8).join(" &nbsp;·&nbsp; ");
+}
+const inp=document.getElementById("q");
+let t;
+inp.addEventListener("input",()=>{const v=norm(inp.value.trim()); render(v.length>=2?v:"");
+  clearTimeout(t); if(v.length>=3){t=setTimeout(()=>{const m=document.querySelector(".zone.match")||document.querySelector(".prov.match");
+  if(m){const y=m.getBoundingClientRect().top+scrollY-110; scrollTo({top:y,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});}},450);}});
+render("");
+</script>
+</html>
